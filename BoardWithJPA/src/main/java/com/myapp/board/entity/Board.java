@@ -13,6 +13,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * Board Entity 클래스
+ * @author dowonlee
+ *
+ */
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED) //기본 생성자 생성
 @Entity //클래스와 테이블간의 매핑 JPA 엔티티
@@ -59,5 +64,15 @@ public class Board {
 		this.deleteYn = deleteYn;
 	}
 	
+	/*
+	 * 게시글 수정용 메서드
+	 */
+	public void update(String title, String content, String writer, char noticeYn, char secretYn) {
+		this.title = title;
+		this.content = content;
+		this.writer = writer;
+		this.noticeYn = noticeYn;
+		this.secretYn = secretYn;
+	}
 	
 }
