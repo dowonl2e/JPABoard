@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="board/layout/basic">
+	<th:block layout:fragment="title">
+		<title>This page is a list page</title>
+	</th:block>
+
+	<!--<th:block layout:fragment="search">
+		<div th:replace="board/fragments/common :: search"></div>
+	</th:block>-->
+
+	<th:block layout:fragment="content">
+		<div class="table-responsive clearfix">
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th>번호</th>
+						<th>제목</th>
+						<th>작성자</th>
+						<th>등록일</th>
+						<th>조회 수</th>
+					</tr>
+				</thead>
+				<tbody id="list"></tbody>
+			</table>
+
+			<!--<div class="btn_wrap text-right">
+				<a th:href="|@{/board/write}${params.makeQueryString(params.currentPageNo)}|" class="btn btn-primary waves-effect waves-light">Write</a>
+			</div>-->
+
+			<!--<th:block layout:fragment="paging">
+				<nav th:replace="board/fragments/common :: pagination"></nav>
+			</th:block>-->
+		</div>
+	</th:block>
+	<th:block layout:fragment="script">
+		<script th:inline="javascript">
+			/*<![CDATA[*/
+			window.onload = () => {
+			    findAll();
+			}
+			/*
+			function movePage(uri, queryString) {
+				location.href = uri + queryString;
+			}
+			
+			function searchBoard(form) {
+				if (isEmpty(form) == true) {
+					var searchKeyword = document.getElementById("mainSearchKeyword");
+					if (isEmpty(searchKeyword.value) == true) {
+						alert("키워드를 입력해 주세요.");
+						searchKeyword.focus();
+						return false;
+					}
+
+					form = document.getElementById("searchForm");
+					form.searchKeyword.value = searchKeyword.value;
+					form.submit();
+				}
+
+				if (isEmpty(form.searchKeyword.value) == true) {
+					alert("키워드를 입력해 주세요.");
+					form.searchKeyword.focus();
+					return false;
+				}
+			}
+			*/
+			
+			/**
+			 * 게시글 리스트 조회
+			 */
+			function findAll() {
+			
+				fetch('/api/boards?deleteYn=N').then(response => {
+					if (response.ok) {
+			 					return response.json();
+					}
+				}).then(json => {
+					let html = '';
+			
+					if (!json.length) {
+						html = '<td colspan="5">등록된 게시글이 없습니다.</td>';
+					} else {
+						json.forEach((obj, idx) => {
+							html += `
+								<tr>
+			  						<td>${json.length - idx}</td>
+			  						<td class="text-left">
+			  							<a href="javascript: void(0);" onclick="goView(${obj.num})">${obj.title}</a>
+			  						</td>
+			  						<td>${obj.writer}</td>
+			  						<td>${moment(obj.createdDate).format('YYYY-MM-DD HH:mm:ss')}</td>
+			  						<td>${obj.hits}</td>
+								</tr>
+							`;
+						});
+					}
+					
+					document.getElementById('list').innerHTML = html;
+				});
+			}
+			/**
+ 			 * 게시글 조회
+			 */
+			function goView(num) {
+				location.href = `/board/view/${num}`;
+			}
+
+			/*[- end of function -]*/
+
+			/*]]>*/
+		</script>
+	</th:block>
+</html>
