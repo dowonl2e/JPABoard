@@ -73,6 +73,17 @@ public class Board {
 		this.writer = writer;
 		this.noticeYn = noticeYn;
 		this.secretYn = secretYn;
+		this.modifiedDate = LocalDateTime.now();
 	}
 	
+	/*
+	 * 게시물 조회수 증가
+	 */
+	public void increaseHits() {
+		this.hits++;
+	}
+	
+	public void delete(Long num) {
+		this.deleteYn = 'Y';
+	}
 }

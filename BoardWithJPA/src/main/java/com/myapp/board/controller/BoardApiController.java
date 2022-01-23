@@ -2,12 +2,14 @@ package com.myapp.board.controller;
 
 import java.util.List;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.myapp.board.dto.BoardRequestDTO;
@@ -37,12 +39,23 @@ public class BoardApiController {
 	}
 	
 	@GetMapping("/boards")
-	public List<BoardResponseDTO> findAll(){
-		return boardService.findAll();
+	public List<BoardResponseDTO> findAll(@RequestParam final char deleteYn){
+		return boardService.findAllByDeleteYn(deleteYn);
 	}
 	
+	@GetMapping("/boards/{num}")
+	public BoardResponseDTO findById(@PathVariable final Long num) {
+		return boardService.findbyId(num);
+	}
+
+	
 	@PatchMapping("/boards/{num}")
-	public Long save(@PathVariable final Long num, @RequestBody final BoardRequestDTO params) {
+	public Long update(@PathVariable final Long num, @RequestBody final BoardRequestDTO params) {
 		return boardService.update(num, params);
+	}
+	
+	@DeleteMapping("/boards/{num}")
+	public Long delete(@PathVariable final Long num) {
+		return boardService.delete(num);
 	}
 }

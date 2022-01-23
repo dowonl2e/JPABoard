@@ -1,6 +1,5 @@
 package com.myapp.board.model;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,6 +61,15 @@ public class BoardService {
 	}
 	
 	/**
+	 * 게시글 리스트 조회 -> 삭제 여부 기준
+	 */
+	public List<BoardResponseDTO> findAllByDeleteYn(final char deleteYn){
+		Sort sort = Sort.by(Direction.DESC, "num", "createdDate");
+		List<Board> list = boardRepository.findAllByDeleteYn(deleteYn, sort);
+		return list.stream().map(BoardResponseDTO::new).collect(Collectors.toList());
+	}
+	
+	/**
 	 * 게시글 수정
 	 */
 	@Transactional
@@ -79,6 +87,26 @@ public class BoardService {
 		*/
 		
 		entity.update(params.getTitle(), params.getContent(), params.getWriter(), params.getNoticeYn(), params.getSecretYn());
+		return num;
+	}
+	
+	/**
+	 * 게시글 조회수 증가
+	 */
+	@Transactional
+	public BoardResponseDTO findbyId(Long num) {
+		Board entity = boardRepository.findById(num).orElseThrow(() -> new CustomException(ErrorCode.POSTS_NOT_FOUND));
+		entity.increaseHits();
+		return new BoardResponseDTO(entity);
+	}
+	
+	/**
+	 * 게시물 삭제
+	 */
+	@Transactional
+	public Long delete(Long num) {
+		Board entity = boardRepository.findById(num).orElseThrow(() -> new CustomException(ErrorCode.POSTS_NOT_FOUND));
+		entity.delete(num);
 		return num;
 	}
 }
