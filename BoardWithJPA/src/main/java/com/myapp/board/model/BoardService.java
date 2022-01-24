@@ -3,6 +3,7 @@ package com.myapp.board.model;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
@@ -66,6 +67,14 @@ public class BoardService {
 	public List<BoardResponseDTO> findAllByDeleteYn(final char deleteYn){
 		Sort sort = Sort.by(Direction.DESC, "num", "createdDate");
 		List<Board> list = boardRepository.findAllByDeleteYn(deleteYn, sort);
+		return list.stream().map(BoardResponseDTO::new).collect(Collectors.toList());
+	}
+	
+	/**
+	 * 게시글 리스트 조회 -> 삭제 여부 기준
+	 */
+	public List<BoardResponseDTO> findAllByDeleteYn(final char deleteYn, final Pageable pageable){
+		List<Board> list = boardRepository.findAllByDeleteYn(deleteYn, pageable);
 		return list.stream().map(BoardResponseDTO::new).collect(Collectors.toList());
 	}
 	
