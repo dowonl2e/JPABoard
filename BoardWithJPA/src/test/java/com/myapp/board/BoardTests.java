@@ -7,15 +7,23 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Pageable;
 
+import com.myapp.board.common.QueryOperator;
+import com.myapp.board.dto.BoardRequestDTO;
+import com.myapp.board.dto.BoardResponseDTO;
 import com.myapp.board.entity.Board;
 import com.myapp.board.entity.BoardRepository;
+import com.myapp.board.model.BoardService;
 
 @SpringBootTest
 public class BoardTests {
 
 	@Autowired
 	BoardRepository boardRepository;
+	
+	@Autowired
+	BoardService boardService;
 	
 	@Test
 	void save() {
@@ -55,6 +63,21 @@ public class BoardTests {
 		//게시글 전체 조회
 		List<Board> boards = boardRepository.findAll();
 	}
+	
+	@Test
+	void findAllWithSearch() {
+		//게시물 조건 파라미터 값 추가
+		final BoardRequestDTO params = new BoardRequestDTO();
+		params.setOperator(QueryOperator.LIKE);
+		params.setSearchWord("테스터");
+		
+		//페이지 사이즈
+		Pageable pageable = Pageable.ofSize(20);
+		
+		//게시글 전체 조회
+		List<BoardResponseDTO> boards = boardService.findAll(params, pageable);
+	}
+	
 	
 	@Test
 	void delete() {
