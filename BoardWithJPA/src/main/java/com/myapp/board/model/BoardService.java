@@ -1,13 +1,17 @@
 package com.myapp.board.model;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import com.myapp.board.dto.BoardRequestDTO;
 import com.myapp.board.dto.BoardResponseDTO;
@@ -15,6 +19,7 @@ import com.myapp.board.entity.Board;
 import com.myapp.board.entity.BoardRepository;
 import com.myapp.board.exception.CustomException;
 import com.myapp.board.exception.ErrorCode;
+import com.myapp.board.specification.BoardSpecification;
 
 import lombok.RequiredArgsConstructor;
 
@@ -71,11 +76,22 @@ public class BoardService {
 	}
 	
 	/**
-	 * 게시글 리스트 조회 -> 삭제 여부 기준
+	 * 게시글 리스트 조회 -> 삭제 여부 + 페이징
 	 */
 	public List<BoardResponseDTO> findAllByDeleteYn(final char deleteYn, final Pageable pageable){
 		List<Board> list = boardRepository.findAllByDeleteYn(deleteYn, pageable);
 		return list.stream().map(BoardResponseDTO::new).collect(Collectors.toList());
+	}
+	
+	/**
+	 * 게시글 리스트 조회 -> 검색조건 + 페이징
+	 */
+	public List<BoardResponseDTO> findAll(final BoardRequestDTO params, final Pageable pageable){
+		Page<Board> list = ObjectUtils.isEmpty(params.getOperator()) 
+				? boardRepository.findAll(pageable) 
+						: boardRepository.findAll(BoardSpecification.searchWith(params), pageable);
+		return list.getContent().stream().map(BoardResponseDTO::new).collect(Collectors.toList());
+		//return list.stream().map(BoardResponseDTO::new).collect(Collectors.toList());
 	}
 	
 	/**
