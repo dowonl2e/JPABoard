@@ -1,6 +1,7 @@
 package com.myapp.board.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -50,13 +51,30 @@ public class BoardApiController {
 	 * @param pageable
 	 * @return
 	 */
+	/*
 	@GetMapping("/boards")
 	public List<BoardResponseDTO> findAll(@RequestParam final char deleteYn
 			, @PageableDefault(page = 1, size = 20) @SortDefaults({
 				@SortDefault(sort = "num", direction = Direction.DESC),
 				@SortDefault(sort = "createdDate", direction = Direction.DESC)
 			}) final Pageable pageable){
-		return boardService.findAllByDeleteYn(deleteYn, pageable);
+		//삭제 키 있는 케이스의 경우 페이저블 처리
+		//return boardService.findAllByDeleteYn(deleteYn, pageable)
+	}
+	*/
+	/**
+	 * 게시물 리스트 조회 -> 검색조건 + 페이징
+	 * @param params
+	 * @param pageable
+	 * @return
+	 */
+	@GetMapping("/boards")
+	public List<BoardResponseDTO> findAll(final BoardRequestDTO params
+			, @PageableDefault(page = 1, size = 20) @SortDefaults({
+				@SortDefault(sort = "num", direction = Direction.DESC),
+				@SortDefault(sort = "createdDate", direction = Direction.DESC)
+			}) final Pageable pageable){
+		return boardService.findAll(params, pageable);
 	}
 	
 	@GetMapping("/boards/{num}")
