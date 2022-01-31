@@ -1,5 +1,7 @@
 package com.myapp.board.model;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -8,13 +10,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 
 import com.myapp.board.dto.BoardRequestDTO;
 import com.myapp.board.dto.BoardResponseDTO;
+import com.myapp.board.dto.SearchDTO;
 import com.myapp.board.entity.Board;
 import com.myapp.board.entity.BoardRepository;
 import com.myapp.board.exception.CustomException;
@@ -67,7 +68,7 @@ public class BoardService {
 	}
 	
 	/**
-	 * 게시글 리스트 조회 -> 삭제 여부 기준
+	 * 게시글 리스트 조회 -> 삭제 여부 + 정렬
 	 */
 	public List<BoardResponseDTO> findAllByDeleteYn(final char deleteYn){
 		Sort sort = Sort.by(Direction.DESC, "num", "createdDate");
@@ -76,7 +77,7 @@ public class BoardService {
 	}
 	
 	/**
-	 * 게시글 리스트 조회 -> 삭제 여부 + 페이징
+	 * 게시글 리스트 조회 -> 삭제 여부 + 페이징 + 정렬
 	 */
 	public List<BoardResponseDTO> findAllByDeleteYn(final char deleteYn, final Pageable pageable){
 		List<Board> list = boardRepository.findAllByDeleteYn(deleteYn, pageable);
@@ -84,14 +85,48 @@ public class BoardService {
 	}
 	
 	/**
-	 * 게시글 리스트 조회 -> 검색조건 + 페이징
+	 * 게시글 리스트 조회 -> 검색조건 + 페이징 + 정렬
 	 */
+	/*
 	public List<BoardResponseDTO> findAll(final BoardRequestDTO params, final Pageable pageable){
 		Page<Board> list = ObjectUtils.isEmpty(params.getOperator()) 
 				? boardRepository.findAll(pageable) 
 						: boardRepository.findAll(BoardSpecification.searchWith(params), pageable);
 		return list.getContent().stream().map(BoardResponseDTO::new).collect(Collectors.toList());
 		//return list.stream().map(BoardResponseDTO::new).collect(Collectors.toList());
+	}
+	*/
+	
+	/**
+	 * 게시글 리스트 조회2 -> 검색조건 + 페이징
+	 */
+	public Map<String, Object> findAll(final SearchDTO params, final Pageable pageable){
+		
+		/*
+		long totalcount = boardRepository.count(BoardSpecification.searchWith(params));
+		
+		if(totalcount < 1) {
+			return Collections.emptyMap();
+		}
+		*/
+		
+		
+		
+		Page<Board> boardlist = boardRepository.findAll(BoardSpecification.searchWith(params), pageable);
+		List<BoardResponseDTO> list = boardlist.getContent().stream().map(BoardResponseDTO::new).collect(Collectors.toList());
+		
+		params.setTotalPage(boardlist.getTotalPages()-1);
+		params.setPageNumber(boardlist.getNumber());
+		params.setSize(boardlist.getSize());
+		params.setHasPrevPage(boardlist.hasPrevious());
+		params.setHasNextPage(boardlist.hasNext());
+		params.setTotalCount(boardlist.getTotalElements());
+		
+		Map<String, Object> response = new HashMap<String, Object>();
+		response.put("params", params);
+		response.put("list", list);
+		
+		return response;
 	}
 	
 	/**
