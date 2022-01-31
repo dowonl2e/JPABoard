@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
  *
  */
 @Getter
-@NoArgsConstructor(access = AccessLevel.PUBLIC)
-public class BoardRequestDTO extends SearchDTO {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class BoardRequestDTO {
 	
 	private String title;
 	private String content;
