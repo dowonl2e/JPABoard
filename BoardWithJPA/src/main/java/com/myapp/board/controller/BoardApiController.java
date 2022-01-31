@@ -1,9 +1,7 @@
 package com.myapp.board.controller;
 
-import java.util.List;
 import java.util.Map;
 
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
@@ -21,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.myapp.board.dto.BoardRequestDTO;
 import com.myapp.board.dto.BoardResponseDTO;
+import com.myapp.board.dto.SearchDTO;
 import com.myapp.board.exception.CustomException;
 import com.myapp.board.exception.ErrorCode;
 import com.myapp.board.model.BoardService;
@@ -69,8 +68,8 @@ public class BoardApiController {
 	 * @return
 	 */
 	@GetMapping("/boards")
-	public List<BoardResponseDTO> findAll(final BoardRequestDTO params
-			, @PageableDefault(page = 1, size = 20) @SortDefaults({
+	public Map<String, Object> findAll(final SearchDTO params
+			, @PageableDefault(page = 0, size = 10) @SortDefaults({
 				@SortDefault(sort = "num", direction = Direction.DESC),
 				@SortDefault(sort = "createdDate", direction = Direction.DESC)
 			}) final Pageable pageable){
