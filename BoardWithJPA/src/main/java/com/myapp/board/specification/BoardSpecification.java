@@ -10,17 +10,16 @@ import javax.persistence.criteria.Root;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.ObjectUtils;
 
-import com.myapp.board.dto.BoardRequestDTO;
+import com.myapp.board.dto.SearchDTO;
 import com.myapp.board.entity.Board;
 
 import lombok.RequiredArgsConstructor;
 
-@SuppressWarnings("serial")
 @RequiredArgsConstructor
 public class BoardSpecification {
 
 	
-	public static Specification<Board> searchWith(BoardRequestDTO params){
+	public static Specification<Board> searchWith(SearchDTO params){
 		return (Specification<Board>) ((root, query, builder) -> {
 			List<Predicate> predicate = getPredicateWithSearchtitle(params, root, builder);
 			/*
@@ -31,48 +30,31 @@ public class BoardSpecification {
 		});
 	}
 	
-	public static List<Predicate> getPredicateWithSearchtitle(BoardRequestDTO params, Root<Board> root, CriteriaBuilder builder){
+	public static List<Predicate> getPredicateWithSearchtitle(SearchDTO params, Root<Board> root, CriteriaBuilder builder){
 		List<Predicate> predicatelist = new ArrayList<Predicate>();
-		if(ObjectUtils.isEmpty(params.getSearchWord()) == false) {
+		
+		predicatelist.add(builder.equal(root.get("deleteYn"), (ObjectUtils.isEmpty(params.getDeleteYn()) ? 'N' : params.getDeleteYn().charAt(0))));
+				
+		if(ObjectUtils.isEmpty(params.getKeyword()) == false) {
 			if(ObjectUtils.isEmpty(params.getSearchType())) {
-				predicatelist.add(builder.like(root.get("title"), "%"+params.getSearchWord()+"%"));
+				predicatelist.add(builder.like(root.get("title"), "%"+params.getKeyword()+"%"));
 				predicatelist.add(
 					builder.or(
-						builder.like(root.get("title"), "%"+params.getSearchWord()+"%"),
-						builder.like(root.get("content"), "%"+params.getSearchWord()+"%"),
-						builder.like(root.get("writer"), "%"+params.getSearchWord()+"%")
+						builder.like(root.get("title"), "%"+params.getKeyword()+"%"),
+						builder.like(root.get("content"), "%"+params.getKeyword()+"%"),
+						builder.like(root.get("writer"), "%"+params.getKeyword()+"%")
 					)
 				);
 			}
 			else {
 				if(params.getSearchType().equals("title"))
-					predicatelist.add(builder.and(builder.like(root.get("title"), "%"+params.getSearchWord()+"%")));
+					predicatelist.add(builder.and(builder.like(root.get("title"), "%"+params.getKeyword()+"%")));
 				else if(params.getSearchType().equals("content"))
-					predicatelist.add(builder.and(builder.like(root.get("content"), "%"+params.getSearchWord()+"%")));
+					predicatelist.add(builder.and(builder.like(root.get("content"), "%"+params.getKeyword()+"%")));
 				else if(params.getSearchType().equals("writer"))
-					predicatelist.add(builder.and(builder.like(root.get("writer"), "%"+params.getSearchWord()+"%")));
+					predicatelist.add(builder.and(builder.like(root.get("writer"), "%"+params.getKeyword()+"%")));
 			}
 		}
-		
-		/*
-		switch(params.getOperator()) {
-			case EQUALS:
-				predicatelist.add(builder.equal(root.get("title"), params.getSearchTitle()));
-				break;
-			case NOT_EQUALS:
-				predicatelist.add(builder.notEqual(root.get("title"), params.getSearchTitle()));
-				break;
-			case LIKE:
-				predicatelist.add(builder.like(root.get("title"), "%"+params.getSearchTitle()+"%"));
-				break;
-			case NOT_LIKE:
-				predicatelist.add(builder.notLike(root.get("title"), "%"+params.getSearchTitle()+"%"));
-				break;
-			default:
-				predicatelist.add(builder.like(root.get("title"), params.getSearchTitle()));
-				break;
-		}
-		*/
 		
 		return predicatelist;
 	}
