@@ -90,14 +90,14 @@
 		   	* 뒤로가기
 		   	*/
 		 	function goList() {
-				location.href = '/board/list';
+				location.href = '/board/list' + location.search;
 		  	}
 		
 		  	/**
 		     * 수정하기
 		     */
 		  	function goModify() {
-		  		location.href = `/board/modify?num=[[ ${num} ]]`;
+		  		location.href = `/board/modify` + location.search + `&num=[[ ${num} ]]`;
 		  	}
 		
 		  	/**

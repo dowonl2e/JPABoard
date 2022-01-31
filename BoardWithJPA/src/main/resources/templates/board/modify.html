@@ -43,7 +43,7 @@
 				</div>
 	
 				<div class="btn_wrap text-center">
-					<a th:href="@{/board/list}" class="btn btn-default waves-effect waves-light">뒤로가기</a>
+    				<a href="javascript: void(0);" onclick="goView();" class="btn btn-default waves-effect waves-light">뒤로가기</a>
 					<button type="button" onclick="modify(); return false;" class="btn btn-primary waves-effect waves-light">수정하기</button>
 				</div>
 			</form>
@@ -120,12 +120,19 @@
 					}
 					
 					alert('수정되었습니다.');
-					location.href = '/board/list';
+					goView();
 				}).catch(error => {
 					alert('오류가 발생하였습니다.');
 				});
 			}
-	
+			
+			/**
+		   	* 뒤로가기
+		   	*/
+		 	function goView() {
+				location.href = `/board/view/[[ ${num} ]]` + location.search;
+			}
+		  	
 		/*]]>*/
 	    </script>
 	</th:block>
